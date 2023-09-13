@@ -1,12 +1,13 @@
 const { User } = require("../model/User");
+const { sanitizeUser } = require("../services/common");
 
 exports.fetchUserById = async (req, res) => {
   const { id } = req.user;
   try {
     const user = await User.findById(id);
-    delete user.password;
-    delete user.salt;
-    res.status(200).json(user);
+    // res.status(200).json(sanitizeUser(user));
+    // res.status(200).json(user);
+    res.status(200).json({id:user.id, addresses:user.addresses,role:user.role,email:user.email});
   } catch (err) {
     res.status(400).json(err);
   }

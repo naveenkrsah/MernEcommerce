@@ -1,8 +1,8 @@
 const { User } = require("../model/User");
 const crypto = require("crypto");
 const { sanitizeUser } = require("../services/common");
-const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'SECRET_KEY';
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "SECRET_KEY";
 
 exports.createUser = async (req, res) => {
   try {
@@ -20,8 +20,14 @@ exports.createUser = async (req, res) => {
           if (err) {
             res.status(401).json(err);
           } else {
-            const token = jwt.sign(sanitizeUser(user), SECRET_KEY);
-            res.status(201).json(token);
+            const token = jwt.sign(sanitizeUser(user), process.env.JWT_SECRET_KEY);
+            res
+              .cookie("token", token, {
+                expires: new Date(Date.now() + 3600000),
+                httpOnly: true,
+              })
+              .status(201)
+              .json({ id: doc.id, role: doc.role });
           }
         });
       }
@@ -32,9 +38,21 @@ exports.createUser = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
-  res.json(req.user);
+  const user = req.user;
+  res
+    .cookie("token", user.token, {
+      expires: new Date(Date.now() + 900000),
+      httpOnly: true,
+    })
+    // .json(req.user.token);
+    .json({id:user.id,role:user.role,token:user.token});
 };
 
-exports.checkUser = async (req,res) => {
-  res.json(sanitizeUser(req.user));
+exports.checkAuth = async (req, res) => {
+  if (req.user) {
+    res.json(sanitizeUser(req.user));
+    // res.json(req.user);
+  } else {
+    res.sendStatus(401);
+  }
 };

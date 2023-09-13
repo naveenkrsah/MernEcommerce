@@ -35,7 +35,7 @@ exports.deleteFromCart = async (req, res) => {
 };
 
 exports.updateCart = async (req, res) => {
-  const { id } = req.user;
+  const { id } = req.params;
   try {
     const doc = await Cart.findByIdAndUpdate(id, req.body, { new: true });
     const result = await doc.populate("product");
