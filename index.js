@@ -54,9 +54,9 @@ server.post(
     // Return a 200 response to acknowledge receipt of the event
     response.send();
   }
-);
+); 
 
-const opts = {};
+const opts = {};   
 opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = process.env.JWT_SECRET_KEY;
 
